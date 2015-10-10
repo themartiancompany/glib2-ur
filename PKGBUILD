@@ -3,7 +3,7 @@
 pkgbase=glib2
 pkgname=(glib2 glib2-docs)
 pkgver=2.46.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Common C routines used by GTK+ and other libs"
 url="http://www.gtk.org/"
 arch=(i686 x86_64)
@@ -23,6 +23,12 @@ prepare() {
   
 build() {
   cd glib-$pkgver
+
+  ## Prevent runtime unloading of glib
+  # https://bugs.archlinux.org/task/46619
+  # https://bugzilla.gnome.org/show_bug.cgi?id=755609
+  LDFLAGS+=" -Wl,-z,nodelete"
+
   PYTHON=/usr/bin/python2 ./configure --prefix=/usr --libdir=/usr/lib \
       --sysconfdir=/etc \
       --with-pcre=system \
