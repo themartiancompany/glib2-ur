@@ -1,8 +1,8 @@
 pkgbase = glib2
 	pkgdesc = Low level core library
-	pkgver = 2.78.1
+	pkgver = 2.78.2
 	pkgrel = 1
-	url = https://wiki.gnome.org/Projects/GLib
+	url = https://gitlab.gnome.org/GNOME/glib
 	arch = x86_64
 	license = LGPL
 	checkdepends = desktop-file-utils
@@ -23,7 +23,7 @@ pkgbase = glib2
 	depends = zlib
 	options = debug
 	options = staticlibs
-	source = git+https://gitlab.gnome.org/GNOME/glib.git#commit=21624e78f013ee8706483086e3086076d08fe242
+	source = git+https://gitlab.gnome.org/GNOME/glib.git#commit=eb14755943a6eaee772ff4d8a8e432ec33bc5a8a
 	source = git+https://gitlab.gnome.org/GNOME/gvdb.git
 	source = 0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
 	source = gio-querymodules.hook
