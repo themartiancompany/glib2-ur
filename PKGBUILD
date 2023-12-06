@@ -7,7 +7,7 @@ pkgname=(
   glib2-docs
 )
 pkgver=2.78.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Low level core library"
 url="https://gitlab.gnome.org/GNOME/glib"
 license=(LGPL)
@@ -43,14 +43,12 @@ source=(
   "git+https://gitlab.gnome.org/GNOME/glib.git#commit=$_commit"
   "git+https://gitlab.gnome.org/GNOME/gvdb.git"
   0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
-  0002-xdgmime-Handle-realloc-moving-the-buffer-in-_xdg_mim.patch
   gio-querymodules.hook
   glib-compile-schemas.hook
 )
 b2sums=('SKIP'
         'SKIP'
         '94c73ca7070c239494873dd52d6ee09382bbb5b1201f7afd737cfa140b1a2fb0744b2c2831baf3943d1d072550c35888d21ce6f19f89481ff9d1a60d9a0b30e0'
-        '07934c9ce5fce140532b503b41ebeadccd781ee1004329d689808a21d992797e8fe5c21c16f84ace7b4e9f7891efe32d33ee9f459c6b22cbc4ef99548df5d12c'
         '14c9211c0557f6d8d9a914f1b18b7e0e23f79f4abde117cb03ab119b95bf9fa9d7a712aa0a29beb266468aeb352caa3a9e4540503cfc9fe0bbaf764371832a96'
         'd30d349b4cb4407839d9074ce08f5259b8a5f3ca46769aabc621f17d15effdb89c4bf19bd23603f6df3d59f8d1adaded0f4bacd0333afcab782f2d048c882858')
 
@@ -67,8 +65,8 @@ prepare() {
   git apply -3 ../0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
 
   # Unbreak Firefox
-  # https://gitlab.freedesktop.org/xdg/xdgmime/-/issues/37
-  git apply -3 ../0002-xdgmime-Handle-realloc-moving-the-buffer-in-_xdg_mim.patch
+  # https://gitlab.gnome.org/GNOME/glib/-/issues/3196
+  git cherry-pick -n b097adf18aedbb13b3d0e4cf260c3fede8d8995e
 
   git submodule init
   git submodule set-url subprojects/gvdb "$srcdir/gvdb"
