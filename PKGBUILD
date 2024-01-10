@@ -1,4 +1,5 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Maintainer: Fabian Bornschein <fabiscafe@archlinux.org>
 # Contributor: Jan de Groot <jgc@archlinux.org>
 
 pkgbase=glib2
@@ -6,11 +7,11 @@ pkgname=(
   glib2
   glib2-docs
 )
-pkgver=2.78.3
+pkgver=2.79.0
 pkgrel=1
 pkgdesc="Low level core library"
 url="https://gitlab.gnome.org/GNOME/glib"
-license=(LGPL)
+license=(LGPL-2.1-or-later)
 arch=(x86_64)
 depends=(
   libffi
@@ -23,10 +24,13 @@ makedepends=(
   dbus
   gettext
   git
-  gtk-doc
+  gi-docgen
+  gobject-introspection
   libelf
   meson
   python
+  python-docutils
+  python-packaging
   shared-mime-info
   util-linux
 )
@@ -38,7 +42,7 @@ options=(
   debug
   staticlibs
 )
-_commit=03f7c1fbf3a3784cb4c3604f83ca3645e9225577  # tags/2.78.3^0
+_commit=e597b189c36651d83dd72dfdc8530682c80fc235  # tags/2.79.0^0
 source=(
   "git+https://gitlab.gnome.org/GNOME/glib.git#commit=$_commit"
   "git+https://gitlab.gnome.org/GNOME/gvdb.git"
@@ -73,7 +77,8 @@ build() {
   local meson_options=(
     --default-library both
     -D glib_debug=disabled
-    -D gtk_doc=true
+    -D documentation=true
+    -D introspection=enabled
     -D man=true
     -D selinux=disabled
     -D sysprof=enabled
@@ -119,7 +124,7 @@ package_glib2() {
 
   # Split docs
   mkdir -p docs/usr/share
-  mv {"$pkgdir",docs}/usr/share/gtk-doc
+  mv {"$pkgdir",docs}/usr/share/doc
 }
 
 package_glib2-docs() {
