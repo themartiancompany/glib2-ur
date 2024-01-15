@@ -7,7 +7,7 @@ pkgname=(
   glib2
   glib2-docs
 )
-pkgver=2.79.0
+pkgver=2.79.0+r48+g4ba14ff28
 pkgrel=1
 pkgdesc="Low level core library"
 url="https://gitlab.gnome.org/GNOME/glib"
@@ -42,7 +42,7 @@ options=(
   debug
   staticlibs
 )
-_commit=e597b189c36651d83dd72dfdc8530682c80fc235  # tags/2.79.0^0
+_commit=4ba14ff28de90d1a1e9e7e1fee539edf73a82c7b  # main^0
 source=(
   "git+https://gitlab.gnome.org/GNOME/glib.git#commit=$_commit"
   "git+https://gitlab.gnome.org/GNOME/gvdb.git"
@@ -130,7 +130,7 @@ package_glib2() {
 package_glib2-docs() {
   pkgdesc+=" - documentation"
   depends=()
-  license+=(custom)
+  license+=(LicenseRef-Public-Domain)
 
   mv -t "$pkgdir" docs/*
   install -Dt "$pkgdir/usr/share/licenses/$pkgname" -m644 glib/docs/reference/COPYING
