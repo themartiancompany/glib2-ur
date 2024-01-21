@@ -2,8 +2,10 @@ pkgbase = glib2
 	pkgdesc = Low level core library
 	pkgver = 2.78.3
 	pkgrel = 1
-	url = https://gitlab.gnome.org/GNOME/glib
+	url = http://gitlab..org/GNOME/glib
 	arch = x86_64
+	arch = arm
+	arch = aarch64
 	license = LGPL
 	checkdepends = desktop-file-utils
 	checkdepends = glib2
@@ -23,8 +25,8 @@ pkgbase = glib2
 	depends = zlib
 	options = debug
 	options = staticlibs
-	source = git+https://gitlab.gnome.org/GNOME/glib.git#commit=03f7c1fbf3a3784cb4c3604f83ca3645e9225577
-	source = git+https://gitlab.gnome.org/GNOME/gvdb.git
+	source = git+file:///data/data/com.termux/files/home#commit=03f7c1fbf3a3784cb4c3604f83ca3645e9225577
+	source = git+http://gitlab..org/GNOME/gvdb.git
 	source = 0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
 	source = gio-querymodules.hook
 	source = glib-compile-schemas.hook
@@ -45,11 +47,11 @@ pkgname = glib2
 	optdepends = gvfs: most gio functionality
 	optdepends = libelf: gresource inspection tool
 	optdepends = python: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report
-	provides = libglib-2.0.so
-	provides = libgio-2.0.so
-	provides = libgmodule-2.0.so
-	provides = libgobject-2.0.so
-	provides = libgthread-2.0.so
+	provides = libglib-2.0.so=2.78.3
+	provides = libgio-2.0.so=2.78.3
+	provides = libgmodule-2.0.so=2.78.3
+	provides = libgobject-2.0.so=2.78.3
+	provides = libgthread-2.0.so=2.78.3
 
 pkgname = glib2-docs
 	pkgdesc = Low level core library - documentation
