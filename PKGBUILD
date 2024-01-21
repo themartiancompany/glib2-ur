@@ -6,6 +6,7 @@
 # Contributor: Truocolo <truocolo@aol.com>
 
 _docs=false
+_checks=false
 _py="python"
 _pkg="glib"
 _proj="gnome"
@@ -97,12 +98,13 @@ prepare() {
 meson_options=(
   --default-library both
   -D glib_debug=disabled
-  -D gtk_doc=${_docs}
-  -D man=true
+  -D gtk_doc="${_docs}"
+  -D introspection="true"
+  -D man="${_docs}"
+  -D glib_checks="${_checks}"
   -D selinux=disabled
   -D sysprof=disabled
 )
-
 [[ \
   "$( \
     uname \
