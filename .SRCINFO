@@ -12,6 +12,7 @@ pkgbase = glib2
 	license = LGPL
 	checkdepends = desktop-file-utils
 	checkdepends = glib2
+	makedepends = gcc
 	makedepends = dbus
 	makedepends = gettext
 	makedepends = git

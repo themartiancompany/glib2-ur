@@ -43,6 +43,7 @@ depends=(
   zlib
 )
 makedepends=(
+  gcc
   dbus
   gettext
   git
@@ -105,7 +106,7 @@ meson_options=(
 [[ \
   "$( \
     uname \
-      -u)" == "Android" ]] && \
+      -o)" == "Android" ]] && \
   meson_options+=(
     -D libmount="disabled"
     -D tests=false
