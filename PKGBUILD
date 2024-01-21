@@ -102,6 +102,15 @@ meson_options=(
   -D sysprof=disabled
 )
 
+[[ \
+  "$( \
+    uname \
+      -u)" == "Android" ]] && \
+  meson_options+=(
+    -D libmount="disabled"
+    -D tests=false
+  )
+
 build() {
   # Produce more debug info: GLib has a lot of useful macros
   CFLAGS+=" -g3"
