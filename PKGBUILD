@@ -5,7 +5,7 @@
 # Contributor: Pellegrino Prevete <pellegrinoprevetea@gmail.com>
 # Contributor: Truocolo <truocolo@aol.com>
 
-_docs=true
+_docs=false
 _pkg="glib"
 pkgbase="${_pkg}2"
 pkgname=(
@@ -21,7 +21,7 @@ pkgdesc="Low level core library"
 _http="http://gitlab.${_proj}.org"
 _ns="GNOME"
 url="${_http}/${_ns}/${_pkg}"
-_local="file://${HOME}"
+_local="file://${HOME}/${_pkg}"
 license=(
   LGPL
 )
