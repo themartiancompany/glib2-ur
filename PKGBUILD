@@ -6,7 +6,10 @@
 # Contributor: Truocolo <truocolo@aol.com>
 
 _docs=false
+_py="python"
 _pkg="glib"
+_proj="gnome"
+_ns="GNOME"
 pkgbase="${_pkg}2"
 pkgname=(
   "${pkgbase}"
@@ -19,7 +22,6 @@ pkgver=2.78.3
 pkgrel=1
 pkgdesc="Low level core library"
 _http="http://gitlab.${_proj}.org"
-_ns="GNOME"
 url="${_http}/${_ns}/${_pkg}"
 _local="file://${HOME}/${_pkg}"
 license=(
@@ -29,6 +31,9 @@ arch=(
   x86_64
   arm
   aarch64
+  powerpc
+  i686
+  pentium4
 )
 depends=(
   libffi
@@ -44,13 +49,13 @@ makedepends=(
   gtk-doc
   libelf
   meson
-  python
+  "${_py}"
   shared-mime-info
   util-linux
 )
 checkdepends=(
   desktop-file-utils
-  glib2
+  "${_pkg}2"
 )
 options=(
   debug
@@ -132,12 +137,13 @@ package_glib2() {
     libmount.so
   )
   provides+=(
+    "${_pkg}=${pkgver}"
     "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
   )
   optdepends=(
     'gvfs: most gio functionality'
     'libelf: gresource inspection tool'
-    'python: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report'
+    "${_py}: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report"
   )
 
   meson \
@@ -155,11 +161,11 @@ package_glib2() {
   touch \
     "${pkgdir}/usr/lib/gio/modules/.keep"
 
-  python \
+  "${_py}" \
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
     "$pkgdir/usr/share/${_pkg}-2.0/codegen"
-  python \
+  "${_py}" \
     -O \
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
@@ -172,14 +178,16 @@ package_glib2() {
       -p \
       docs/usr/share
     mv \
-      {"$pkgdir",docs}"/usr/share/gtk-doc"
+      {"${pkgdir}",docs}"/usr/share/gtk-doc"
   fi
 }
 
 package_glib2-docs() {
   pkgdesc+=" - documentation"
   depends=()
-  license+=(custom)
+  license+=(
+  custom
+)
 
   mv \
     -t \
