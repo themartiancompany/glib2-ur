@@ -7,6 +7,7 @@
 # Contributor: Truocolo <truocolo@aol.com>
 
 _docs=false
+_checks=false
 _py="python"
 _pkg="glib"
 _proj="gnome"
@@ -44,10 +45,12 @@ depends=(
   zlib
 )
 makedepends=(
+  gcc
   dbus
   gettext
   git
   gi-docgen
+  gtk-doc
   gobject-introspection
   libelf
   meson
@@ -124,12 +127,26 @@ meson_options=(
   --default-library both
   -D glib_debug=disabled
   -D gtk_doc="${_docs}"
+<<<<<<< HEAD
   -D documentation="${_docs}"
   -D introspection=enabled
   -D man=true
+=======
+  -D introspection="true"
+  -D man="${_docs}"
+  -D glib_checks="${_checks}"
+>>>>>>> 188e1a86caa9429b3946bbcef2d62c8365741e8c
   -D selinux=disabled
   -D sysprof=disabled
 )
+[[ \
+  "$( \
+    uname \
+      -o)" == "Android" ]] && \
+  meson_options+=(
+    -D libmount="disabled"
+    -D tests=false
+  )
 
 build() {
   # Produce more debug info: GLib has a lot of useful macros
