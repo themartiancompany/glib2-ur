@@ -99,16 +99,17 @@ meson_options=(
   --default-library both
   -D glib_debug=disabled
   -D gtk_doc="${_docs}"
-  -D introspection="true"
+  # -D documentation="${_docs}"
+  # -D introspection="true"
   -D man="${_docs}"
   -D glib_checks="${_checks}"
   -D selinux=disabled
   -D sysprof=disabled
 )
-[[ \
-  "$( \
-    uname \
-      -o)" == "Android" ]] && \
+_os="$( \
+  uname \
+    -o)"
+[[ "${_os}" == "Android" ]] && \
   meson_options+=(
     -D libmount="disabled"
     -D tests=false
@@ -117,6 +118,10 @@ meson_options=(
 build() {
   # Produce more debug info: GLib has a lot of useful macros
   CFLAGS+=" -g3"
+  [[ "${_os}" == "Android" ]] && \
+    CFLAGS+=" -Wno-error=format-security" && \
+    CFLAGS+=" -Wno-error=format-nonliteral" && \
+    CFLAGS+=" -Wno-error=implicit-function-declaration" && \
   CXXFLAGS+=" -g3"
   # use fat LTO objects for static libraries
   CFLAGS+=" -ffat-lto-objects"
@@ -146,8 +151,11 @@ check() {
 package_glib2() {
   depends+=(
     libffi.so
-    libmount.so
   )
+  [[ "${_os}" != "Android" ]] && \
+    depends+=(
+      libmount.so
+    )
   provides+=(
     "${_pkg}=${pkgver}"
     "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
@@ -157,22 +165,19 @@ package_glib2() {
     'libelf: gresource inspection tool'
     "${_py}: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report"
   )
-
   meson \
     install \
       -C \
         build \
       --destdir \
         "${pkgdir}"
-
   install \
     -Dt \
-      "${pkgdir}/usr/share/libalpm/hooks" \
+    "${pkgdir}/usr/share/libalpm/hooks" \
     -m644 \
-      *.hook
+    *.hook
   touch \
     "${pkgdir}/usr/lib/gio/modules/.keep"
-
   "${_py}" \
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
@@ -182,7 +187,6 @@ package_glib2() {
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
     "${pkgdir}/usr/share/${_pkg}-2.0/codegen"
-
   # Split docs
   if \
     [[ "${_docs}" == true ]]; then
@@ -198,18 +202,17 @@ package_glib2-docs() {
   pkgdesc+=" - documentation"
   depends=()
   license+=(
-  custom
-)
-
+    custom
+  )
   mv \
     -t \
-      "${pkgdir}" \
+    "${pkgdir}" \
     "docs/"*
   install \
     -Dt \
-      "${pkgdir}/usr/share/licenses/${pkgname}" \
-      -m644 \
-        "${_pkg}/docs/reference/COPYING"
+    "${pkgdir}/usr/share/licenses/${pkgname}" \
+    -m644 \
+    "${_pkg}/docs/reference/COPYING"
 }
 
 # vim:set sw=2 sts=-1 et:

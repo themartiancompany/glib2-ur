@@ -47,7 +47,6 @@ pkgname = glib2
 	depends = util-linux-libs
 	depends = zlib
 	depends = libffi.so
-	depends = libmount.so
 	optdepends = gvfs: most gio functionality
 	optdepends = libelf: gresource inspection tool
 	optdepends = python: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report
