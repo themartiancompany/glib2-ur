@@ -23,7 +23,6 @@ pkgbase = glib2
 	makedepends = shared-mime-info
 	makedepends = util-linux
 	depends = libffi
-	depends = libsysprof-capture
 	depends = pcre2
 	depends = util-linux-libs
 	depends = zlib
@@ -42,7 +41,6 @@ pkgbase = glib2
 
 pkgname = glib2
 	depends = libffi
-	depends = libsysprof-capture
 	depends = pcre2
 	depends = util-linux-libs
 	depends = zlib
@@ -51,8 +49,11 @@ pkgname = glib2
 	optdepends = libelf: gresource inspection tool
 	optdepends = python: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report
 	provides = glib=2.78.3
+	provides = glib-bin=2.78.3
 	provides = libglib-2.0.so=2.78.3
 	provides = libgio-2.0.so=2.78.3
 	provides = libgmodule-2.0.so=2.78.3
 	provides = libgobject-2.0.so=2.78.3
 	provides = libgthread-2.0.so=2.78.3
+	conflicts = glib
+	conflicts = glib-bin

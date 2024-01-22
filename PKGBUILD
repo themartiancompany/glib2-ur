@@ -5,7 +5,11 @@
 # Contributor: Pellegrino Prevete <pellegrinoprevetea@gmail.com>
 # Contributor: Truocolo <truocolo@aol.com>
 
+_os="$( \
+  uname \
+    -o)"
 _docs=false
+_sysprof="disabled"
 _checks=false
 _py="python"
 _pkg="glib"
@@ -38,10 +42,13 @@ arch=(
 )
 depends=(
   libffi
-  libsysprof-capture
   pcre2
   util-linux-libs
   zlib
+)
+[[ "${_sysprof}" == "enabled" ]] && \
+  depends+=(
+    libsysprof-capture
 )
 makedepends=(
   gcc
@@ -104,11 +111,9 @@ meson_options=(
   -D man="${_docs}"
   -D glib_checks="${_checks}"
   -D selinux=disabled
-  -D sysprof=disabled
+  -D sysprof="${_sysprof}"
 )
-_os="$( \
-  uname \
-    -o)"
+
 [[ "${_os}" == "Android" ]] && \
   meson_options+=(
     -D libmount="disabled"
@@ -158,7 +163,12 @@ package_glib2() {
     )
   provides+=(
     "${_pkg}=${pkgver}"
+    "${_pkg}-bin=${pkgver}"
     "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
+  )
+  conflicts+=(
+    "${_pkg}"
+    "${_pkg}-bin"
   )
   optdepends=(
     'gvfs: most gio functionality'
