@@ -51,7 +51,6 @@ depends=(
     libsysprof-capture
 )
 makedepends=(
-  gcc
   dbus
   gettext
   git
