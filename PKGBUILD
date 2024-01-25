@@ -79,8 +79,8 @@ options=(
 _commit=03f7c1fbf3a3784cb4c3604f83ca3645e9225577  # tags/2.78.3^0
 source=(
   # "git+${url}.git#commit=$_commit"
-  "git+${_local}#commit=$_commit"
-  "git+${_local_gvdb}#commit=$_commit"
+  "git+${_local}#commit=${_commit}"
+  "git+${_local_gvdb}"
   # "git+${_http}/${_ns}/gvdb.git"
   0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
   gio-querymodules.hook
