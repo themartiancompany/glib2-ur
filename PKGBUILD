@@ -82,9 +82,9 @@ source=(
   "git+${_local}#commit=${_commit}"
   "git+${_local_gvdb}"
   # "git+${_http}/${_ns}/gvdb.git"
-  0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
+  "0001-${_pkg}-compile-schemas-Remove-noisy-deprecation-warnin.patch"
   gio-querymodules.hook
-  glib-compile-schemas.hook
+  "${_pkg}-compile-schemas.hook"
 )
 b2sums=(
   'SKIP'
