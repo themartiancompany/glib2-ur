@@ -8,9 +8,15 @@
 _os="$( \
   uname \
     -o)"
-_docs=false
-_sysprof="disabled"
-_checks=false
+_docs='false'
+_checks='true'
+_libmount='enabled'
+_sysprof="enabled"
+[[ "${_os}" == "Android" ]] && \
+  _checks='false' && \
+  _docs='false' && \
+  _libmount='disabled' && \
+  _sysprof='disabled'
 _py="python"
 _pkg="glib"
 _proj="gnome"
@@ -78,28 +84,56 @@ source=(
   gio-querymodules.hook
   glib-compile-schemas.hook
 )
-b2sums=('SKIP'
-        'SKIP'
-        '94c73ca7070c239494873dd52d6ee09382bbb5b1201f7afd737cfa140b1a2fb0744b2c2831baf3943d1d072550c35888d21ce6f19f89481ff9d1a60d9a0b30e0'
-        '14c9211c0557f6d8d9a914f1b18b7e0e23f79f4abde117cb03ab119b95bf9fa9d7a712aa0a29beb266468aeb352caa3a9e4540503cfc9fe0bbaf764371832a96'
-        'd30d349b4cb4407839d9074ce08f5259b8a5f3ca46769aabc621f17d15effdb89c4bf19bd23603f6df3d59f8d1adaded0f4bacd0333afcab782f2d048c882858')
-
+b2sums=(
+  'SKIP'
+  'SKIP'
+  '94c73ca7070c239494873dd52d6ee09382bbb5b1201f7afd737cfa140b1a2fb0744b2c2831baf3943d1d072550c35888d21ce6f19f89481ff9d1a60d9a0b30e0'
+  '14c9211c0557f6d8d9a914f1b18b7e0e23f79f4abde117cb03ab119b95bf9fa9d7a712aa0a29beb266468aeb352caa3a9e4540503cfc9fe0bbaf764371832a96'
+  'd30d349b4cb4407839d9074ce08f5259b8a5f3ca46769aabc621f17d15effdb89c4bf19bd23603f6df3d59f8d1adaded0f4bacd0333afcab782f2d048c882858'
+)
 
 pkgver() {
-  cd glib
-  git describe --tags | sed 's/[^-]*-g/r&/;s/-/+/g'
+  cd \
+    "${_pkg}"
+  git \
+    describe \
+      --tags | \
+  sed \
+    's/[^-]*-g/r&/;s/-/+/g'
 }
 
 prepare() {
-  cd glib
+  cd \
+    "${_pkg}"
 
   # Suppress noise from glib-compile-schemas.hook
-  git apply -3 ../0001-glib-compile-schemas-Remove-noisy-deprecation-warnin.patch
-
-  git submodule init
-  git submodule set-url subprojects/gvdb "$srcdir/gvdb"
-  git -c protocol.file.allow=always submodule update
+  git \
+    apply \
+      -3 \
+      ../"0001-${_pkg}-compile-schemas-Remove-noisy-deprecation-warnin.patch"
+  git \
+    submodule \
+      init
+  git \
+    submodule \
+      set-url \
+        subprojects/gvdb \
+        "${srcdir}/gvdb"
+  git \
+    -c \
+      protocol.file.allow=always \
+    submodule \
+      update
 }
+
+_prefix="$( \
+  dirname \
+    "$( \
+      dirname \
+        "$( \
+          command \
+            -v \
+            "cc")")")"
 
 meson_options=(
   --default-library both
@@ -109,15 +143,11 @@ meson_options=(
   # -D introspection="true"
   -D man="${_docs}"
   -D glib_checks="${_checks}"
+  -D libmount="${_libmount}"
   -D selinux=disabled
   -D sysprof="${_sysprof}"
+  -D tests="${_checks}"
 )
-
-[[ "${_os}" == "Android" ]] && \
-  meson_options+=(
-    -D libmount="disabled"
-    -D tests=false
-  )
 
 build() {
   # Produce more debug info: GLib has a lot of useful macros
@@ -153,13 +183,17 @@ check() {
 }
 
 package_glib2() {
+  local \
+    _f
   depends+=(
     libffi.so
   )
-  [[ "${_os}" != "Android" ]] && \
+  [[ "${_libmount}" == "enabled" ]] && \
     depends+=(
       libmount.so
     )
+  # But really, glib 1.x builds fine so
+  # termux-pacman should rename glib to glib2
   [[ "${_os}" == "Android" ]] && \
     provides+=(
       "${_pkg}=${pkgver}"
@@ -197,6 +231,15 @@ package_glib2() {
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
     "${pkgdir}/usr/share/${_pkg}-2.0/codegen"
+  for _f  \
+    in \
+      find \
+        "${pkgdir}/usr/lib/pkgconfig"; do
+    sed \
+      -i
+      "s%prefix=/usr%prefix=${_prefix}%"
+      "${_f}"
+  done
   # Split docs
   if \
     [[ "${_docs}" == true ]]; then
