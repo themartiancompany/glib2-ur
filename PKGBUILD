@@ -154,11 +154,11 @@ meson_options=(
 build() {
   # Produce more debug info: GLib has a lot of useful macros
   CFLAGS+=" -g3"
+  CXXFLAGS+=" -g3"
   [[ "${_os}" == "Android" ]] && \
     CFLAGS+=" -Wno-error=format-security" && \
     CFLAGS+=" -Wno-error=format-nonliteral" && \
     CFLAGS+=" -Wno-error=implicit-function-declaration" && \
-  CXXFLAGS+=" -g3"
   # use fat LTO objects for static libraries
   CFLAGS+=" -ffat-lto-objects"
   CXXFLAGS+=" -ffat-lto-objects"
@@ -202,6 +202,7 @@ package_glib2() {
       "${_pkg}-bin=${pkgver}"
       "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
     )
+    # termux should package glib1
     # conflicts+=(
     #   "${_pkg}"
     #   "${_pkg}-bin"
@@ -209,7 +210,7 @@ package_glib2() {
   optdepends=(
     'gvfs: most gio functionality'
     'libelf: gresource inspection tool'
-    "${_py}: gdbus-codegen, glib-genmarshal, glib-mkenums, gtester-report"
+    "${_py}: gdbus-codegen, ${_pkg}-genmarshal, ${_pkg}-mkenums, gtester-report"
   )
   meson \
     install \
