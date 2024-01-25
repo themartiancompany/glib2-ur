@@ -160,15 +160,16 @@ package_glib2() {
     depends+=(
       libmount.so
     )
-  provides+=(
-    "${_pkg}=${pkgver}"
-    "${_pkg}-bin=${pkgver}"
-    "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
-  )
-  conflicts+=(
-    "${_pkg}"
-    "${_pkg}-bin"
-  )
+  [[ "${_os}" == "Android" ]] && \
+    provides+=(
+      "${_pkg}=${pkgver}"
+      "${_pkg}-bin=${pkgver}"
+      "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
+    )
+    # conflicts+=(
+    #   "${_pkg}"
+    #   "${_pkg}-bin"
+    # )
   optdepends=(
     'gvfs: most gio functionality'
     'libelf: gresource inspection tool'
