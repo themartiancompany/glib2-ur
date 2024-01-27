@@ -234,10 +234,14 @@ package_glib2() {
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
     "${pkgdir}/usr/share/${_pkg}-2.0/codegen"
+  tree \
+    "${pkgdir}/usr/lib/"
   for _f  \
     in \
-      find \
-        "${pkgdir}/usr/lib/pkgconfig"; do
+      $(\
+        find \
+          "${pkgdir}/usr/lib/pkgconfig/" | \
+          grep ".pc"); do
     sed \
       -i \
       "s%prefix=/usr%prefix=${_prefix}%" \
