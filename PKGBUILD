@@ -239,8 +239,8 @@ package_glib2() {
       find \
         "${pkgdir}/usr/lib/pkgconfig"; do
     sed \
-      -i
-      "s%prefix=/usr%prefix=${_prefix}%"
+      -i \
+      "s%prefix=/usr%prefix=${_prefix}%" \
       "${_f}"
   done
   # Split docs
