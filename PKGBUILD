@@ -32,6 +32,7 @@ _os="$( \
     -o)"
 _offline="false"
 _termux="false"
+_bash_completion="true"
 _debug="false"
 _docs='false'
 _devel="true"
@@ -136,6 +137,11 @@ makedepends=(
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
     'g-ir-scanner'
+  )
+fi
+if [[ "${_bash_completion}" == "true" ]]; then
+  makedepends+=(
+    "bash-completion"
   )
 fi
 checkdepends=(
@@ -393,9 +399,11 @@ package_glib2() {
   _pick \
     "devel" \
     "usr/share/glib-2.0/codegen/"
-  _pick \
-    "devel" \
-    "usr/share/bash-completion/completions/gresource"
+  if [[ "${_bash_completion}" == "true"]]; then
+    _pick \
+      "devel" \
+      "usr/share/bash-completion/completions/gresource"
+  fi
   if [[ "${_docs}" == "true" ]]; then
     _pick \
       "devel" \
