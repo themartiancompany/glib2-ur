@@ -311,9 +311,15 @@ _pick() {
 package_glib2() {
   local \
     _f
-  depends+=(
-    "libffi.so"
-  )
+  if [[ "${_os}" == "GNU/Linux" ]]; then
+    depends+=(
+      "libffi.so"
+    )
+  elif [[ "${_os}" == "Android" ]]; then
+    depends+=(
+      "libffi"
+    )
+  fi
   if [[ "${_libmount}" == "enabled" ]]; then
     depends+=(
       "libmount.so"
