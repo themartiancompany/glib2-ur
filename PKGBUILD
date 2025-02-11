@@ -137,7 +137,7 @@ if [[ "${_offline}" == "true" ]]; then
   _url="${_local}"
   _gvdb_url="${_local_gvdb}"
 fi
-_commit="03f7c1fbf3a3784cb4c3604f83ca3645e9225577"  # tags/2.78.3^0
+_commit="ca20e4ac71864f08e980dc044ac96c06d5482b37"  # tags/2.82.4^0
 source=(
   "git+${_url}.git#commit=$_commit"
   "git+${_gvdb_url}"
