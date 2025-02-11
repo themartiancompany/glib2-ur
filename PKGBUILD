@@ -204,13 +204,18 @@ _prefix="$( \
                -n \
                  1)")")"
 
+if [[ "${_docs}" == "false" ]]; then
+  _man_pages="disabled"
+fi
+
 meson_options=(
   --default-library both
   -D glib_debug="disabled"
-  -D gtk_doc="${_docs}"
-  # -D documentation="${_docs}"
+  # -D gtk_doc="${_docs}"
+  -D documentation="${_docs}"
   # -D introspection="true"
-  -D man="${_docs}"
+  # -D man="${_docs}"
+  -D man-pages="${_man_pages}"
   -D glib_checks="${_checks}"
   -D libmount="${_libmount}"
   -D selinux=disabled
