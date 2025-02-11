@@ -222,6 +222,7 @@ meson_options=(
   -D sysprof="${_sysprof}"
   -D tests="${_checks}"
   -D systemtap="disabled"
+  -D dtrace="false"
 )
 
 build() {
