@@ -123,6 +123,11 @@ makedepends=(
   'shared-mime-info'
   'util-linux'
 )
+if [[ "${_os}" == "Android" ]]; then
+  makedepends+=(
+    'g-ir-scanner'
+  )
+fi
 checkdepends=(
   'desktop-file-utils'
   "${_pkg}2"
