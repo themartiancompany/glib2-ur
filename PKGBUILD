@@ -1,22 +1,52 @@
 # SPDX-License-Identifier: AGPL-3.0
+
+#    ----------------------------------------------------------------------
+#    Copyright © 2024, 2025  Pellegrino Prevete
 #
+#    All rights reserved
+#    ----------------------------------------------------------------------
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Maintainer: Truocolo <truocolo@aol.com>
+# Maintainer: Truocolo <truocolo@0x6E5163fC4BFc1511Dbe06bB605cc14a3e462332b>
+# Maintainer: Pellegrino Prevete (dvorak) <pellegrinoprevete@gmail.com>
+# Maintainer: Pellegrino Prevete (dvorak) <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Maintainer: Fabian Bornschein <fabiscafe@archlinux.org>
 # Contributor: Jan de Groot <jgc@archlinux.org>
-# Contributor: Pellegrino Prevete <pellegrinoprevetea@gmail.com>
-# Contributor: Truocolo <truocolo@aol.com>
 
 _os="$( \
   uname \
     -o)"
+_offline="false"
+_termux="false"
 _docs='false'
+_devel="true"
 _checks='true'
 _libmount='enabled'
 _sysprof="enabled"
-[[ "${_os}" == "Android" ]] && \
-  _checks='false' && \
-  _docs='false' && \
-  _libmount='disabled' && \
+if [[ "${_os}" == "GNU/Linux" ]]; then
+  _libc="glibc"
+elif [[ "${_os}" == "Android" ]]; then
+  _checks='false'
+  _docs='false'
+  _libc="ndk-sysroot"
+  _libmount='disabled'
   _sysprof='disabled'
+  _termux="true"
+fi
 _py="python"
 _pkg="glib"
 _proj="gnome"
@@ -25,11 +55,17 @@ pkgbase="${_pkg}2"
 pkgname=(
   "${pkgbase}"
 )
-[[ "${_docs}" == "true" ]] && \
+if [[ "${_devel}" == "true" ]]; then
+  pkgname+=(
+    "${pkgbase}-devel"
+  )
+fi
+if [[ "${_docs}" == "true" ]]; then
   pkgname+=(
     "${pkgbase}-docs"
   )
-pkgver=2.78.3
+fi
+pkgver=2.82.4
 pkgrel=1
 pkgdesc="Low level core library"
 _http="http://gitlab.${_proj}.org"
@@ -37,53 +73,76 @@ url="${_http}/${_ns}/${_pkg}"
 _local="file://${HOME}/${_pkg}"
 _local_gvdb="file://${HOME}/gvdb"
 license=(
-  LGPL
+  'LGPL-2.1-or-later'
 )
 arch=(
-  x86_64
-  arm
-  aarch64
-  powerpc
-  i686
-  pentium4
+  'x86_64'
+  'arm'
+  'aarch64'
+  'armv7l'
+  'mips'
+  'powerpc'
+  'i686'
+  'pentium4'
 )
 depends=(
-  libffi
-  pcre2
-  util-linux-libs
-  zlib
+  'bash'
+  "${_libc}"
+  'libffi'
+  'pcre2'
+  'zlib'
 )
-[[ "${_sysprof}" == "enabled" ]] && \
+if [[ "${_termux}" == "true" ]]; then
   depends+=(
-    libsysprof-capture
+    "libandroid-support"
+    "libiconv"
+  )
+elif [[ "${_os}" == "GNU/Linux" ]]; then
+  depends+=(
+    'util-linux-libs'
+  )
+fi
+if [[ "${_sysprof}" == "enabled" ]]; then
+  depends+=(
+    'libsysprof-capture'
 )
+fi
 makedepends=(
-  dbus
-  gettext
-  git
-  gtk-doc
-  libelf
-  meson
+  'dbus'
+  'dconf'
+  'gettext'
+  'git'
+  'gi-docgen'
+  'gtk-doc'
+  'gobject-introspection'
+  'libelf'
+  'meson'
   "${_py}"
-  shared-mime-info
-  util-linux
+  "${_py}-docutils"
+  "${_py}-packaging"
+  'shared-mime-info'
+  'util-linux'
 )
 checkdepends=(
-  desktop-file-utils
+  'desktop-file-utils'
   "${_pkg}2"
 )
 options=(
-  debug
-  staticlibs
+  'debug'
+  'staticlibs'
 )
-_commit=03f7c1fbf3a3784cb4c3604f83ca3645e9225577  # tags/2.78.3^0
+_url="${url}"
+_gvdb_url="${_http}/${_ns}/gvdb"
+if [[ "${_offline}" == "true" ]]; then
+  _url="${_local}"
+  _gvdb_url="${_local_gvdb}"
+fi
+_commit="03f7c1fbf3a3784cb4c3604f83ca3645e9225577"  # tags/2.78.3^0
 source=(
-  # "git+${url}.git#commit=$_commit"
-  "git+${_local}#commit=${_commit}"
-  "git+${_local_gvdb}"
-  # "git+${_http}/${_ns}/gvdb.git"
+  "git+${_url}.git#commit=$_commit"
+  "git+${_gvdb_url}"
   "0001-${_pkg}-compile-schemas-Remove-noisy-deprecation-warnin.patch"
-  gio-querymodules.hook
+  "gio-querymodules.hook"
   "${_pkg}-compile-schemas.hook"
 )
 b2sums=(
@@ -107,12 +166,17 @@ pkgver() {
 prepare() {
   cd \
     "${_pkg}"
-
+  # Drop dep on libatomic
+  # https://gitlab.archlinux.org/archlinux/packaging/packages/qemu/-/issues/6
+  git \
+    revert \
+      -n \
+        "4e6dc4dee0e1c6407113597180d9616b4f275f94"
   # Suppress noise from glib-compile-schemas.hook
   git \
     apply \
       -3 \
-      ../"0001-${_pkg}-compile-schemas-Remove-noisy-deprecation-warnin.patch"
+      "../0001-${_pkg}-compile-schemas-Remove-noisy-deprecation-warnin.patch"
   git \
     submodule \
       init
@@ -130,16 +194,19 @@ prepare() {
 
 _prefix="$( \
   dirname \
-    "$( \
-      dirname \
-        "$( \
-          command \
-            -v \
-            "cc")")")"
+    "$(dirname \
+        "$(command \
+             -v \
+             "cc" \
+             "clang" \
+             "gcc" | \
+             head \
+               -n \
+                 1)")")"
 
 meson_options=(
   --default-library both
-  -D glib_debug=disabled
+  -D glib_debug="disabled"
   -D gtk_doc="${_docs}"
   # -D documentation="${_docs}"
   # -D introspection="true"
@@ -149,19 +216,21 @@ meson_options=(
   -D selinux=disabled
   -D sysprof="${_sysprof}"
   -D tests="${_checks}"
+  -D systemtap="disabled"
 )
 
 build() {
   # Produce more debug info: GLib has a lot of useful macros
   CFLAGS+=" -g3"
   CXXFLAGS+=" -g3"
-  [[ "${_os}" == "Android" ]] && \
-    CFLAGS+=" -Wno-error=format-security" && \
-    CFLAGS+=" -Wno-error=format-nonliteral" && \
-    CFLAGS+=" -Wno-error=implicit-function-declaration" && \
+  if [[ "${_os}" == "Android" ]]; then
+    CFLAGS+=" -Wno-error=format-security"
+    CFLAGS+=" -Wno-error=format-nonliteral"
+    CFLAGS+=" -Wno-error=implicit-function-declaration"
   # use fat LTO objects for static libraries
-  CFLAGS+=" -ffat-lto-objects"
-  CXXFLAGS+=" -ffat-lto-objects"
+    CFLAGS+=" -ffat-lto-objects"
+    CXXFLAGS+=" -ffat-lto-objects"
+  fi
   arch-meson \
     "${_pkg}" \
       build \
@@ -184,33 +253,59 @@ check() {
         --print-errorlogs
 }
 
+_pick() {
+  local \
+    _p="${1}" \
+    _f \
+    _d
+  shift
+  for _f; do
+    _d="${srcdir}/${_p}/${_f#${pkgdir}/}"
+    mkdir \
+      -p \
+      "$(dirname \
+           "${_d}")"
+    mv \
+      "${_f}" \
+      "${_d}"
+    rmdir \
+      -p \
+      --ignore-fail-on-non-empty \
+      "$(dirname \
+           "${_f}")"
+    done
+}
+
+
 package_glib2() {
   local \
     _f
   depends+=(
-    libffi.so
+    "libffi.so"
   )
-  [[ "${_libmount}" == "enabled" ]] && \
+  if [[ "${_libmount}" == "enabled" ]]; then
     depends+=(
-      libmount.so
+      "libmount.so"
     )
+  fi
   # But really, glib 1.x builds fine so
   # termux-pacman should rename glib to glib2
-  [[ "${_os}" == "Android" ]] && \
+  if [[ "${_os}" == "Android" ]]; then
     provides+=(
       "${_pkg}=${pkgver}"
       "${_pkg}-bin=${pkgver}"
-      "libg"{lib,io,module,object,thread}"-2.0.so=${pkgver}"
+      "libg"{"lib","io","module","object","thread"}"-2.0.so=${pkgver}"
     )
     # termux should package glib1
     # conflicts+=(
     #   "${_pkg}"
     #   "${_pkg}-bin"
     # )
+  fi
   optdepends=(
+    'dconf: GSettings storage backend'
     'gvfs: most gio functionality'
     'libelf: gresource inspection tool'
-    "${_py}: gdbus-codegen, ${_pkg}-genmarshal, ${_pkg}-mkenums, gtester-report"
   )
   meson \
     install \
@@ -234,12 +329,8 @@ package_glib2() {
     -m compileall \
     -d "/usr/share/${_pkg}-2.0/codegen" \
     "${pkgdir}/usr/share/${_pkg}-2.0/codegen"
-  tree \
-    "${pkgdir}/usr/lib/"
   for _f  \
-    in \
-      $(\
-        find \
+    in $(find \
           "${pkgdir}/usr/lib/pkgconfig/" | \
           grep ".pc"); do
     sed \
@@ -247,27 +338,77 @@ package_glib2() {
       "s%prefix=/usr%prefix=${_prefix}%" \
       "${_f}"
   done
+  cd \
+    "${pkgdir}"
   # Split docs
-  if \
-    [[ "${_docs}" == true ]]; then
-    mkdir \
-      -p \
-      docs/usr/share
-    mv \
-      {"${pkgdir}",docs}"/usr/share/gtk-doc"
+  if [[ "${_docs}" == true ]]; then
+  _pick \
+    "docs" \
+    "usr/share/doc"
   fi
+  # Split devel
+  _pick \
+    "devel" \
+    "usr/bin/gdbus-codegen"
+  _pick \
+    "devel" \
+    "usr/bin/glib-"{"mkenums","genmarshal"}
+  _pick \
+    "devel" \
+    "usr/bin/gresource"
+  _pick \
+    "devel" \
+    "usr/bin/gtester"{"","-report"}
+  _pick \
+    "devel" \
+    "usr/share/gdb/"
+  _pick \
+    "devel" \
+    "usr/share/glib-2.0/gdb/"
+  _pick \
+    "devel" \
+    "usr/share/glib-2.0/codegen/"
+  _pick \
+    "devel" \
+    "usr/share/bash-completion/completions/gresource"
+  _pick \
+    "devel" \
+    "usr/share/man/man1/gdbus-codegen.1"
+  _pick \
+    "devel" \
+    "usr/share/man/man1/glib-"{"mkenums","genmarshal"}".1"
+  _pick \
+    "devel" \
+    "usr/share/man/man1/gresource.1"
+  _pick \
+    "devel" \
+    "usr/share/man/man1/gtester"{"","-report"}".1"
 }
+
+package_glib2-devel() {
+  pkgdesc+=" - development files"
+  depends=(
+    "${_pkg}2"
+    "${_libc}"
+    "libelf"
+    "${_py}"
+    "${_py}-packaging"
+  )
+  mv \
+    "devel/"* \
+    "${pkgdir}"
+}
+
 
 package_glib2-docs() {
   pkgdesc+=" - documentation"
   depends=()
   license+=(
-    custom
+    'LicenseRef-Public-Domain'
   )
   mv \
-    -t \
-    "${pkgdir}" \
-    "docs/"*
+    "docs/"* \
+    "${pkgdir}"
   install \
     -Dt \
     "${pkgdir}/usr/share/licenses/${pkgname}" \
