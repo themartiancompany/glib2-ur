@@ -399,7 +399,7 @@ package_glib2() {
   _pick \
     "devel" \
     "usr/share/glib-2.0/codegen/"
-  if [[ "${_bash_completion}" == "true"]]; then
+  if [[ "${_bash_completion}" == "true" ]]; then
     _pick \
       "devel" \
       "usr/share/bash-completion/completions/gresource"
