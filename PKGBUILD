@@ -32,11 +32,21 @@ _os="$( \
     -o)"
 _offline="false"
 _termux="false"
+_debug="false"
 _docs='false'
 _devel="true"
 _checks='true'
 _libmount='enabled'
 _sysprof="enabled"
+if [[ "${_debug}" == "false" ]]; then
+  _dtrace="disabled"
+  _glib_debug="disabled"
+  _systemtap="disabled"
+elif [[ "${_debug}" == "true" ]]; then
+  _dtrace="enabled"
+  _glib_debug="enabled"
+  _systemtap="enabled"
+fi
 if [[ "${_os}" == "GNU/Linux" ]]; then
   _libc="glibc"
 elif [[ "${_os}" == "Android" ]]; then
@@ -133,9 +143,13 @@ checkdepends=(
   "${_pkg}2"
 )
 options=(
-  # 'debug'
   'staticlibs'
 )
+if [[ "${_debug}" == "true" ]]; then
+  options+=(
+    'debug'
+  )
+fi
 _url="${url}"
 _gvdb_url="${_http}/${_ns}/gvdb"
 if [[ "${_offline}" == "true" ]]; then
@@ -215,7 +229,7 @@ fi
 
 meson_options=(
   --default-library both
-  -D glib_debug="disabled"
+  -D glib_debug="${_glib_debug}"
   # -D gtk_doc="${_docs}"
   -D documentation="${_docs}"
   # -D introspection="true"
@@ -226,8 +240,8 @@ meson_options=(
   -D selinux=disabled
   -D sysprof="${_sysprof}"
   -D tests="${_checks}"
-  -D systemtap="disabled"
-  -D dtrace="false"
+  -D systemtap="${_systemtap}"
+  -D dtrace="${_dtrace}"
 )
 
 build() {
@@ -382,18 +396,20 @@ package_glib2() {
   _pick \
     "devel" \
     "usr/share/bash-completion/completions/gresource"
-  _pick \
-    "devel" \
-    "usr/share/man/man1/gdbus-codegen.1"
-  _pick \
-    "devel" \
-    "usr/share/man/man1/glib-"{"mkenums","genmarshal"}".1"
-  _pick \
-    "devel" \
-    "usr/share/man/man1/gresource.1"
-  _pick \
-    "devel" \
-    "usr/share/man/man1/gtester"{"","-report"}".1"
+  if [[ "${_docs}" == "true" ]]; then
+    _pick \
+      "devel" \
+      "usr/share/man/man1/gdbus-codegen.1"
+    _pick \
+      "devel" \
+      "usr/share/man/man1/glib-"{"mkenums","genmarshal"}".1"
+    _pick \
+      "devel" \
+      "usr/share/man/man1/gresource.1"
+    _pick \
+      "devel" \
+      "usr/share/man/man1/gtester"{"","-report"}".1"
+  fi
 }
 
 package_glib2-devel() {
