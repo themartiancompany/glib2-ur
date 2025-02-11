@@ -128,7 +128,7 @@ checkdepends=(
   "${_pkg}2"
 )
 options=(
-  'debug'
+  # 'debug'
   'staticlibs'
 )
 _url="${url}"
