@@ -375,6 +375,14 @@ package_glib2() {
       "s%prefix=/usr%prefix=${_prefix}%" \
       "${_f}"
   done
+  sed \
+    -i \
+    "s%datarootdir=/usr%datarootdir=${_prefix}%" \
+    "${pkgdir}/usr/bin/glib-gettextize"
+  sed \
+    -i \
+    "s%datadir=/usr%datadir=${_prefix}%" \
+    "${pkgdir}/usr/bin/glib-gettextize"
   cd \
     "${pkgdir}"
   # Split docs
